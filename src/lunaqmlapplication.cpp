@@ -16,15 +16,21 @@
  */
 
 #include <QDebug>
+
 #include <QStringList>
+#include <QFileInfo>
+#include <QDir>
+
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQuickItem>
+
 
 #include <glib.h>
 #include <webos_application.h>
 
 #include "lunaqmlapplication.h"
+#include "applicationdescription.h"
 
 struct webos_application_event_handlers event_handlers = {
     .activate = NULL,
@@ -33,6 +39,8 @@ struct webos_application_event_handlers event_handlers = {
     .relaunch = LunaQmlApplication::onRelaunch,
     .lowmemory = NULL
 };
+
+using namespace luna;
 
 LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     QGuiApplication(argc, argv),
@@ -51,13 +59,13 @@ LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     }
 }
 
-void LunaQmlApplication::launchApp()
+int LunaQmlApplication::launchApp()
 {
     QFile manifestFile(mManifestPath);
     if (!manifestFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning("Failed to read application manifest %s",
-                 manifestPath.toUtf8().constData());
-        return;
+                 mManifestPath.toUtf8().constData());
+        return 1;
     }
 
     QString manifestData = QTextStream(&manifestFile).readAll();
@@ -70,7 +78,7 @@ void LunaQmlApplication::launchApp()
     if (!validateApplication(desc)) {
         qWarning("Got invalid application description for app %s",
                  desc.id().toUtf8().constData());
-        return;
+        return 2;
     }
 
     // We set the application id as application name so that locally stored things for
@@ -79,9 +87,19 @@ void LunaQmlApplication::launchApp()
 
     this->setup(desc.entryPoint());
 
-    this->exec();
+    return this->exec();
 }
 
+bool LunaQmlApplication::validateApplication(const luna::ApplicationDescription& desc)
+{
+    if (desc.id().length() == 0)
+        return false;
+
+    if (desc.entryPoint().isLocalFile() && !QFile::exists(desc.entryPoint().toLocalFile()))
+        return false;
+
+    return true;
+}
 
 LunaQmlApplication::~LunaQmlApplication()
 {
@@ -92,7 +110,7 @@ QString LunaQmlApplication::launchParameters() const
     return mLaunchParameters;
 }
 
-bool LunaQmlApplication::setup(const QString& path)
+bool LunaQmlApplication::setup(const QUrl& path)
 {
     if (path.isEmpty()) {
         qWarning() << "Invalid app path:" << path;
@@ -101,7 +119,7 @@ bool LunaQmlApplication::setup(const QString& path)
 
     mEngine.rootContext()->setContextProperty("application", this);
 
-    QQmlComponent appComponent(&mEngine, QUrl(path));
+    QQmlComponent appComponent(&mEngine, path);
     if (appComponent.isError()) {
         qWarning() << "Errors while loading app from" << path;
         qWarning() << appComponent.errors();

@@ -39,9 +39,9 @@ ApplicationDescription::ApplicationDescription(const ApplicationDescription& oth
     mIcon(other.icon()),
     mEntryPoint(other.entryPoint()),
     mHeadless(other.headless()),
+    mApplicationBasePath(other.basePath()),
     mTrustScope(other.trustScope()),
     mPluginName(other.pluginName()),
-    mApplicationBasePath(other.basePath()),
     mFlickable(other.flickable()),
     mInternetConnectivityRequired(other.internetConnectivityRequired()),
     mUrlsAllowed(other.urlsAllowed()),
@@ -51,9 +51,9 @@ ApplicationDescription::ApplicationDescription(const ApplicationDescription& oth
 
 ApplicationDescription::ApplicationDescription(const QString &data, const QString &applicationBasePath) :
     mHeadless(false),
+    mApplicationBasePath(applicationBasePath),
     mFlickable(false),
     mInternetConnectivityRequired(false),
-    mApplicationBasePath(applicationBasePath),
     mTrustScope(ApplicationDescription::TrustScopeSystem),
     mUserAgent("")
 {

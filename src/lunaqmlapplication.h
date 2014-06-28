@@ -21,6 +21,10 @@
 #include <QQmlEngine>
 #include <QGuiApplication>
 
+namespace luna {
+    class ApplicationDescription;
+}
+
 class LunaQmlApplication : public QGuiApplication
 {
     Q_OBJECT
@@ -30,7 +34,7 @@ public:
     explicit LunaQmlApplication(int& argc, char **argv);
     virtual ~LunaQmlApplication();
 
-    void launchApp();
+    int launchApp();
 
     QString launchParameters() const;
 
@@ -40,8 +44,9 @@ signals:
     void relaunched(const QString& parameters);
 
 private:
-    bool setup(const QString& path);
+    bool setup(const QUrl& path);
     void relaunch(const char *parameters);
+    bool validateApplication(const luna::ApplicationDescription& desc);
 
 private:
     QQmlEngine mEngine;
