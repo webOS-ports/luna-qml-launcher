@@ -25,6 +25,8 @@
 #include <QQmlContext>
 #include <QQuickItem>
 
+#include <QtGui/QGuiApplication>
+#include <QtGui/qpa/qplatformnativeinterface.h>
 
 #include <glib.h>
 #include <webos_application.h>
@@ -131,6 +133,13 @@ bool LunaQmlApplication::setup(const QUrl& path)
         qWarning() << "Error creating app from" << path;
         qWarning() << appComponent.errors();
         return false;
+    }
+
+    QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
+    if( nativeInterface ) {
+        // set different information bits for our window
+        nativeInterface->setWindowProperty(QString("appId"), QVariant(QCoreApplication::applicationName()));
+        nativeInterface->setWindowProperty(QString("type"), QVariant("card"));
     }
 
     appComponent.completeCreate();
