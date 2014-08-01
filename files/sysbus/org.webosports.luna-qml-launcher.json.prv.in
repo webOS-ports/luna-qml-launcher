@@ -1,0 +1,8 @@
+{
+    "role": {
+        "exeName":"@WEBOS_INSTALL_SBINDIR@/luna-qml-launcher",
+        "type": "privileged",
+        "allowedNames": ["*"]
+    },
+    "permissions": []
+}

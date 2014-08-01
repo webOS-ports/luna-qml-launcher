@@ -22,3 +22,5 @@ pkg_check_modules(WEBOS_APPLICATION webos-application REQUIRED)
 pkg_check_modules(LUNA_SERVICE2 luna-service2 REQUIRED)
 
 add_subdirectory(src)
+
+webos_build_system_bus_files()
