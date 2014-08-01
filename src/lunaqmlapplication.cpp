@@ -48,9 +48,6 @@ LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     QGuiApplication(argc, argv),
     mLaunchParameters("{}")
 {
-    webos_application_init("luna-qml-launcher", &event_handlers, this);
-    webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
-
     if (arguments().size() >= 2) {
         mManifestPath = arguments().at(1);
         qDebug() << "Launching app: " << mManifestPath;
@@ -86,6 +83,9 @@ int LunaQmlApplication::launchApp()
     // We set the application id as application name so that locally stored things for
     // each application are separated and remain after the application was stopped.
     QCoreApplication::setApplicationName(desc.id());
+
+    webos_application_init(desc.id().toUtf8().constData(), &event_handlers, this);
+    webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
     this->setup(desc.entryPoint());
 
