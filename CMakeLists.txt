@@ -19,5 +19,6 @@ find_package(PkgConfig "0.22" REQUIRED)
 
 pkg_check_modules(GLIB2 glib-2.0 REQUIRED)
 pkg_check_modules(WEBOS_APPLICATION webos-application REQUIRED)
+pkg_check_modules(LUNA_SERVICE2 luna-service2 REQUIRED)
 
 add_subdirectory(src)

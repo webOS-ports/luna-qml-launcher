@@ -31,6 +31,8 @@
 #include <glib.h>
 #include <webos_application.h>
 
+#include <luna-service.h>
+
 #include "lunaqmlapplication.h"
 #include "applicationdescription.h"
 
@@ -84,12 +86,54 @@ int LunaQmlApplication::launchApp()
     // each application are separated and remain after the application was stopped.
     QCoreApplication::setApplicationName(desc.id());
 
+    setupLs2Configuration(applicationBasePath);
+
     webos_application_init(desc.id().toUtf8().constData(), &event_handlers, this);
     webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
     this->setup(desc.entryPoint());
 
     return this->exec();
+}
+
+void LunaQmlApplication::setupLs2Configuration(const QString& appId, const QString& applicationBasePath)
+{
+    QString pubRolePath = QString("%1/roles/pub/%2.json")
+            .arg(applicationBasePath)
+            .arg(appId);
+
+    if (QFile::exists(pubRolePath))
+        pushLs2Role(pubRolePath, true);
+
+    QString prvRolePath = QString("%1/roles/prv/%2.json")
+            .arg(applicationBasePath)
+            .arg(appId);
+
+    if (QFile::exists(prvRolePath))
+        pushLs2Role(prvRolePath, false);
+}
+
+void LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
+{
+    LSHandle *handle = 0;
+    LSError lserror;
+
+    LSErrorInit(&lserror);
+
+    if (!LSRegister(NULL, &handle, publicBus, &lserror)) {
+        qWarning("Failed to register handle while push %s role: %s",
+                 publicBus ? "public" : "private", lserror.message);
+        LSErrorFree(&lserror);
+        return;
+    }
+
+    if (!LSPushRole(handle, rolePath.toUtf8().constData(), &lserror)) {
+        qWarning("Failed to push %s role: %s", publicBus ? "public" : "private",
+                 lserror.message);
+        LSErrorFree(&lserror);
+    }
+
+    LSUnregister(handle, NULL);
 }
 
 bool LunaQmlApplication::validateApplication(const luna::ApplicationDescription& desc)
