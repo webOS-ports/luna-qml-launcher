@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QGuiApplication>
+#include <QQuickWindow>
 
 namespace luna {
     class ApplicationDescription;
@@ -55,6 +56,7 @@ private:
     QQmlEngine mEngine;
     QString mManifestPath;
     QString mLaunchParameters;
+    QQuickWindow *mWindow;
 };
 
 #endif // PHONEAPPLICATION_H

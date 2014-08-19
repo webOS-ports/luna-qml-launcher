@@ -31,7 +31,7 @@
 #include <glib.h>
 #include <webos_application.h>
 
-#include <luna-service.h>
+#include <lunaservice.h>
 
 #include "lunaqmlapplication.h"
 #include "applicationdescription.h"
@@ -48,7 +48,8 @@ using namespace luna;
 
 LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     QGuiApplication(argc, argv),
-    mLaunchParameters("{}")
+    mLaunchParameters("{}"),
+    mWindow(0)
 {
     if (arguments().size() >= 2) {
         mManifestPath = arguments().at(1);
@@ -86,12 +87,13 @@ int LunaQmlApplication::launchApp()
     // each application are separated and remain after the application was stopped.
     QCoreApplication::setApplicationName(desc.id());
 
-    setupLs2Configuration(applicationBasePath);
+    setupLs2Configuration(desc.id(), applicationBasePath);
 
     webos_application_init(desc.id().toUtf8().constData(), &event_handlers, this);
     webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
-    this->setup(desc.entryPoint());
+    if (!setup(desc.entryPoint()))
+        return -1;
 
     return this->exec();
 }
@@ -120,7 +122,7 @@ void LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
 
     LSErrorInit(&lserror);
 
-    if (!LSRegister(NULL, &handle, publicBus, &lserror)) {
+    if (!LSRegisterPubPriv(NULL, &handle, publicBus, &lserror)) {
         qWarning("Failed to register handle while push %s role: %s",
                  publicBus ? "public" : "private", lserror.message);
         LSErrorFree(&lserror);
@@ -172,21 +174,30 @@ bool LunaQmlApplication::setup(const QUrl& path)
         return false;
     }
 
-    QObject *app = appComponent.beginCreate(mEngine.rootContext());
-    if (!app) {
+    QObject *rootItem = appComponent.beginCreate(mEngine.rootContext());
+    if (!rootItem) {
         qWarning() << "Error creating app from" << path;
         qWarning() << appComponent.errors();
         return false;
     }
 
-    QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
-    if( nativeInterface ) {
-        // set different information bits for our window
-        nativeInterface->setWindowProperty(QString("appId"), QVariant(QCoreApplication::applicationName()));
-        nativeInterface->setWindowProperty(QString("type"), QVariant("card"));
+    appComponent.completeCreate();
+
+    mWindow = static_cast<QQuickWindow*>(rootItem);
+    if (!mWindow) {
+        qWarning() << "Application root item is not a window!";
+        return false;
     }
 
-    appComponent.completeCreate();
+    QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
+    if (nativeInterface) {
+        // Make sure the window is fully created when we want to deal with it
+        mWindow->create();
+
+        // set different information bits for our window
+        nativeInterface->setWindowProperty(mWindow->handle(), QString("appId"), QVariant(QCoreApplication::applicationName()));
+        nativeInterface->setWindowProperty(mWindow->handle(), QString("type"), QVariant("card"));
+    }
 
     return true;
 }
