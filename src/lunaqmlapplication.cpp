@@ -95,7 +95,10 @@ int LunaQmlApplication::launchApp()
     // each application are separated and remain after the application was stopped.
     QCoreApplication::setApplicationName(desc.id());
 
-    setupLs2Configuration(desc.id(), applicationBasePath);
+    if (!setupLs2Configuration(desc.id(), applicationBasePath)) {
+        qWarning("Failed to configure ls2 access correctly");
+        return -1;
+    }
 
     webos_application_init(desc.id().toUtf8().constData(), &event_handlers, this);
     webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
@@ -108,21 +111,15 @@ int LunaQmlApplication::launchApp()
 
 bool LunaQmlApplication::setupLs2Configuration(const QString& appId, const QString& applicationBasePath)
 {
-    QTemporaryFile roleFile;
+    QString privRolePath = QString("/usr/share/ls2/roles/prv/%1.json").arg(appId);
+    if (QFile::exists(privRolePath))
+        pushLs2Role(privRolePath, false);
 
-    if(!roleFile.open()) {
-        qWarning("Failed to create temporary file for role creation");
-        return false;
-    }
+    QString pubRolePath = QString("/usr/share/ls2/roles/pub/%1.json").arg(appId);
+    if (QFile::exists(pubRolePath))
+        pushLs2Role(pubRolePath, true);
 
-    QString roleDescription = QString("{\"role\":{\"exeName\":\"js\",\"type\":\"%1\",\"allowedNames\":[\"com.webos.qmlapp-%2\"]},\"permissions\":[]}")
-                                .arg(mPrivileged ? "privileged" : "regular")
-                                .arg(getpid());
-
-    roleFile.write(roleDescription.toUtf8());
-    roleFile.close();
-
-    return pushLs2Role(roleFile.fileName(), true) && pushLs2Role(roleFile.fileName(), false);
+    return true;
 }
 
 bool LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
@@ -131,6 +128,8 @@ bool LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
     LSError lserror;
 
     LSErrorInit(&lserror);
+
+    qWarning("Pushing role file %s ...", rolePath.toUtf8().constData());
 
     if (!LSRegisterPubPriv(NULL, &handle, publicBus, &lserror)) {
         qWarning("Failed to register handle while push %s role: %s",
