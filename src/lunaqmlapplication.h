@@ -49,14 +49,15 @@ private:
     void relaunch(const char *parameters);
     bool validateApplication(const luna::ApplicationDescription& desc);
 
-    void setupLs2Configuration(const QString& appId, const QString& applicationBasePath);
-    void pushLs2Role(const QString& rolePath, bool publicBus);
+    bool setupLs2Configuration(const QString& appId, const QString& applicationBasePath);
+    bool pushLs2Role(const QString& rolePath, bool publicBus);
 
 private:
     QQmlEngine mEngine;
     QString mManifestPath;
     QString mLaunchParameters;
     QQuickWindow *mWindow;
+    bool mPrivileged;
 };
 
 #endif // PHONEAPPLICATION_H

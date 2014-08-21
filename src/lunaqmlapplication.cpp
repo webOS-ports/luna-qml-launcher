@@ -20,6 +20,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QDir>
+#include <QTemporaryFile>
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -32,6 +33,9 @@
 #include <webos_application.h>
 
 #include <lunaservice.h>
+
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "lunaqmlapplication.h"
 #include "applicationdescription.h"
@@ -49,7 +53,8 @@ using namespace luna;
 LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     QGuiApplication(argc, argv),
     mLaunchParameters("{}"),
-    mWindow(0)
+    mWindow(0),
+    mPrivileged(false)
 {
     if (arguments().size() >= 2) {
         mManifestPath = arguments().at(1);
@@ -83,6 +88,9 @@ int LunaQmlApplication::launchApp()
         return 2;
     }
 
+    if (desc.id().startsWith("org.webosports."))
+        mPrivileged = true;
+
     // We set the application id as application name so that locally stored things for
     // each application are separated and remain after the application was stopped.
     QCoreApplication::setApplicationName(desc.id());
@@ -98,24 +106,26 @@ int LunaQmlApplication::launchApp()
     return this->exec();
 }
 
-void LunaQmlApplication::setupLs2Configuration(const QString& appId, const QString& applicationBasePath)
+bool LunaQmlApplication::setupLs2Configuration(const QString& appId, const QString& applicationBasePath)
 {
-    QString pubRolePath = QString("%1/roles/pub/%2.json")
-            .arg(applicationBasePath)
-            .arg(appId);
+    QTemporaryFile roleFile;
 
-    if (QFile::exists(pubRolePath))
-        pushLs2Role(pubRolePath, true);
+    if(!roleFile.open()) {
+        qWarning("Failed to create temporary file for role creation");
+        return false;
+    }
 
-    QString prvRolePath = QString("%1/roles/prv/%2.json")
-            .arg(applicationBasePath)
-            .arg(appId);
+    QString roleDescription = QString("{\"role\":{\"exeName\":\"js\",\"type\":\"%1\",\"allowedNames\":[\"com.webos.qmlapp-%2\"]},\"permissions\":[]}")
+                                .arg(mPrivileged ? "privileged" : "regular")
+                                .arg(getpid());
 
-    if (QFile::exists(prvRolePath))
-        pushLs2Role(prvRolePath, false);
+    roleFile.write(roleDescription.toUtf8());
+    roleFile.close();
+
+    return pushLs2Role(roleFile.fileName(), true) && pushLs2Role(roleFile.fileName(), false);
 }
 
-void LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
+bool LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
 {
     LSHandle *handle = 0;
     LSError lserror;
@@ -126,16 +136,20 @@ void LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
         qWarning("Failed to register handle while push %s role: %s",
                  publicBus ? "public" : "private", lserror.message);
         LSErrorFree(&lserror);
-        return;
+        return false;
     }
 
     if (!LSPushRole(handle, rolePath.toUtf8().constData(), &lserror)) {
         qWarning("Failed to push %s role: %s", publicBus ? "public" : "private",
                  lserror.message);
         LSErrorFree(&lserror);
+        LSUnregister(handle, NULL);
+        return false;
     }
 
     LSUnregister(handle, NULL);
+
+    return true;
 }
 
 bool LunaQmlApplication::validateApplication(const luna::ApplicationDescription& desc)
