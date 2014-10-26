@@ -21,6 +21,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTemporaryFile>
+#include <QFont>
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -64,6 +65,10 @@ LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
         mLaunchParameters = arguments().at(2);
         qDebug() << "Launched with parameters: " << mLaunchParameters;
     }
+
+    connect(&mEngine, SIGNAL(quit()), this, SLOT(quit()));
+
+    setFont(QFont("Prelude"));
 }
 
 int LunaQmlApplication::launchApp()
@@ -103,7 +108,7 @@ int LunaQmlApplication::launchApp()
     webos_application_init(desc.id().toUtf8().constData(), &event_handlers, this);
     webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
-    if (!setup(desc.entryPoint()))
+    if (!setup(applicationBasePath, desc.entryPoint()))
         return -1;
 
     return this->exec();
@@ -171,12 +176,14 @@ QString LunaQmlApplication::launchParameters() const
     return mLaunchParameters;
 }
 
-bool LunaQmlApplication::setup(const QUrl& path)
+bool LunaQmlApplication::setup(const QString& applicationBasePath, const QUrl& path)
 {
     if (path.isEmpty()) {
         qWarning() << "Invalid app path:" << path;
         return false;
     }
+
+    mEngine.addImportPath(applicationBasePath);
 
     mEngine.rootContext()->setContextProperty("application", this);
 

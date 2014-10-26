@@ -45,7 +45,7 @@ signals:
     void relaunched(const QString& parameters);
 
 private:
-    bool setup(const QUrl& path);
+    bool setup(const QString& applicationBasePath, const QUrl& path);
     void relaunch(const char *parameters);
     bool validateApplication(const luna::ApplicationDescription& desc);
 
