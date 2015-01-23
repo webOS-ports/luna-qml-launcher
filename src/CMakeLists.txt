@@ -9,6 +9,7 @@ include_directories(
 set(SOURCES
     main.cpp
     lunaqmlapplication.cpp
+    applicationwindow.cpp
     applicationdescription.cpp)
 
 add_executable(luna-qml-launcher ${SOURCES} ${RESOURCES})

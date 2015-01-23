@@ -58,6 +58,7 @@ private:
     QString mLaunchParameters;
     QQuickWindow *mWindow;
     bool mPrivileged;
+    bool mHeadless;
 };
 
 #endif // PHONEAPPLICATION_H
