@@ -28,7 +28,6 @@
 #include <QQuickItem>
 
 #include <QtGui/QGuiApplication>
-#include <QtGui/qpa/qplatformnativeinterface.h>
 
 #include <glib.h>
 #include <webos_application.h>
@@ -40,6 +39,7 @@
 
 #include "lunaqmlapplication.h"
 #include "applicationdescription.h"
+#include "applicationwindow.h"
 
 struct webos_application_event_handlers event_handlers = {
     .activate = NULL,
@@ -55,7 +55,8 @@ LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     QGuiApplication(argc, argv),
     mLaunchParameters("{}"),
     mWindow(0),
-    mPrivileged(false)
+    mPrivileged(false),
+    mHeadless(false)
 {
     if (arguments().size() >= 2) {
         mManifestPath = arguments().at(1);
@@ -65,6 +66,8 @@ LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
         mLaunchParameters = arguments().at(2);
         qDebug() << "Launched with parameters: " << mLaunchParameters;
     }
+
+    qmlRegisterType<ApplicationWindow>("LuneOS.Application", 1, 0, "ApplicationWindow");
 
     connect(&mEngine, SIGNAL(quit()), this, SLOT(quit()));
 
@@ -95,6 +98,8 @@ int LunaQmlApplication::launchApp()
 
     if (desc.id().startsWith("org.webosports."))
         mPrivileged = true;
+
+    mHeadless = desc.headless();
 
     // We set the application id as application name so that locally stored things for
     // each application are separated and remain after the application was stopped.
@@ -203,20 +208,12 @@ bool LunaQmlApplication::setup(const QString& applicationBasePath, const QUrl& p
 
     appComponent.completeCreate();
 
-    mWindow = static_cast<QQuickWindow*>(rootItem);
-    if (!mWindow) {
-        qWarning() << "Application root item is not a window!";
-        return false;
-    }
-
-    QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
-    if (nativeInterface) {
-        // Make sure the window is fully created when we want to deal with it
-        mWindow->create();
-
-        // set different information bits for our window
-        nativeInterface->setWindowProperty(mWindow->handle(), QString("appId"), QVariant(QCoreApplication::applicationName()));
-        nativeInterface->setWindowProperty(mWindow->handle(), QString("type"), QVariant("card"));
+    if (!mHeadless) {
+        mWindow = static_cast<QQuickWindow*>(rootItem);
+        if (!mWindow) {
+            qWarning() << "Application root item is not a window!";
+            return false;
+        }
     }
 
     return true;
