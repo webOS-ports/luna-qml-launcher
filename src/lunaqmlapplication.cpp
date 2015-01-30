@@ -39,7 +39,6 @@
 
 #include "lunaqmlapplication.h"
 #include "applicationdescription.h"
-#include "applicationwindow.h"
 
 struct webos_application_event_handlers event_handlers = {
     .activate = NULL,
@@ -66,8 +65,6 @@ LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
         mLaunchParameters = arguments().at(2);
         qDebug() << "Launched with parameters: " << mLaunchParameters;
     }
-
-    qmlRegisterType<ApplicationWindow>("LuneOS.Application", 1, 0, "ApplicationWindow");
 
     connect(&mEngine, SIGNAL(quit()), this, SLOT(quit()));
 
