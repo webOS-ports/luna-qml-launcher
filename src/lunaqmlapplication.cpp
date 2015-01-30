@@ -69,6 +69,10 @@ LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     connect(&mEngine, SIGNAL(quit()), this, SLOT(quit()));
 
     setFont(QFont("Prelude"));
+    // We can safely set this to false here as the compositor will make sure
+    // that unless we're allowed by having multiple windows or those which
+    // are marked with keepAlive that we get killed.
+    setQuitOnLastWindowClosed(false);
 }
 
 int LunaQmlApplication::launchApp()
