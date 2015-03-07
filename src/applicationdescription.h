@@ -58,6 +58,7 @@ public:
     bool internetConnectivityRequired() const;
     QStringList urlsAllowed() const;
     QString userAgent() const;
+    bool useLuneOSStyle() const;
 
     QString pluginName() const;
     QString basePath() const;
@@ -77,6 +78,7 @@ private:
     bool mInternetConnectivityRequired;
     QStringList mUrlsAllowed;
     QString mUserAgent;
+    bool mUseLuneOSStyle;
 
     void initializeFromData(const QString &data);
     QUrl locateEntryPoint(const QString &entryPoint);
