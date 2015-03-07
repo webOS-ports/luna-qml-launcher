@@ -45,7 +45,8 @@ ApplicationDescription::ApplicationDescription(const ApplicationDescription& oth
     mFlickable(other.flickable()),
     mInternetConnectivityRequired(other.internetConnectivityRequired()),
     mUrlsAllowed(other.urlsAllowed()),
-    mUserAgent(other.userAgent())
+    mUserAgent(other.userAgent()),
+    mUseLuneOSStyle(other.useLuneOSStyle())
 {
 }
 
@@ -55,7 +56,8 @@ ApplicationDescription::ApplicationDescription(const QString &data, const QStrin
     mFlickable(false),
     mInternetConnectivityRequired(false),
     mTrustScope(ApplicationDescription::TrustScopeSystem),
-    mUserAgent("")
+    mUserAgent(""),
+    mUseLuneOSStyle(false)
 {
     initializeFromData(data);
 }
@@ -122,6 +124,9 @@ void ApplicationDescription::initializeFromData(const QString &data)
 
     if (rootObject.contains("userAgent") && rootObject.value("userAgent").isString())
         mUserAgent = rootObject.value("userAgent").toString();
+
+    if (rootObject.contains("useLuneOSStyle") && rootObject.value("useLuneOSStyle").isBool())
+        mUseLuneOSStyle = rootObject.value("useLuneOSStyle").toBool();
 }
 
 QUrl ApplicationDescription::locateEntryPoint(const QString &entryPoint)
@@ -207,6 +212,11 @@ QStringList ApplicationDescription::urlsAllowed() const
 QString ApplicationDescription::userAgent() const
 {
     return mUserAgent;
+}
+
+bool ApplicationDescription::useLuneOSStyle() const
+{
+    return mUseLuneOSStyle;
 }
 
 }

@@ -102,6 +102,9 @@ int LunaQmlApplication::launchApp()
 
     mHeadless = desc.headless();
 
+    if (desc.useLuneOSStyle())
+        setenv("QT_QUICK_CONTROLS_STYLE", "LuneOS", 1);
+
     // We set the application id as application name so that locally stored things for
     // each application are separated and remain after the application was stopped.
     QCoreApplication::setApplicationName(desc.id());
