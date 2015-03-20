@@ -21,6 +21,12 @@ int main(int argc, char **argv)
 {
     /* Usage: luna-qml-launcher manifestPath parameters */
 
+    QString appDataPath = "/media/cryptofs/app-data/";
+    setenv("XDG_DATA_HOME", appDataPath.toUtf8().constData(), 1);
+
+    QString appCachePath = "/media/cryptofs/app-cache/";
+    setenv("XDG_CACHE_HOME", appCachePath.toUtf8().constData(), 1);
+
     LunaQmlApplication application(argc, argv);
     return application.launchApp();
 }
