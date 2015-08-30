@@ -93,31 +93,31 @@ int LunaQmlApplication::launchApp()
 
     if (!validateApplication(desc)) {
         qWarning("Got invalid application description for app %s",
-                 desc.id().toUtf8().constData());
+                 desc.getId().toUtf8().constData());
         return 2;
     }
 
-    if (desc.id().startsWith("org.webosports."))
+    if (desc.getId().startsWith("org.webosports."))
         mPrivileged = true;
 
-    mHeadless = desc.headless();
+    mHeadless = desc.isHeadLess();
 
     if (desc.useLuneOSStyle())
         setenv("QT_QUICK_CONTROLS_STYLE", "LuneOS", 1);
 
     // We set the application id as application name so that locally stored things for
     // each application are separated and remain after the application was stopped.
-    QCoreApplication::setApplicationName(desc.id());
+    QCoreApplication::setApplicationName(desc.getId());
 
-    if (!setupLs2Configuration(desc.id(), applicationBasePath)) {
+    if (!setupLs2Configuration(desc.getId(), applicationBasePath)) {
         qWarning("Failed to configure ls2 access correctly");
         return -1;
     }
 
-    webos_application_init(desc.id().toUtf8().constData(), &event_handlers, this);
+    webos_application_init(desc.getId().toUtf8().constData(), &event_handlers, this);
     webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
-    if (!setup(applicationBasePath, desc.entryPoint()))
+    if (!setup(applicationBasePath, desc.getEntryPoint()))
         return -1;
 
     return this->exec();
@@ -167,10 +167,10 @@ bool LunaQmlApplication::pushLs2Role(const QString &rolePath, bool publicBus)
 
 bool LunaQmlApplication::validateApplication(const luna::ApplicationDescription& desc)
 {
-    if (desc.id().length() == 0)
+    if (desc.getId().length() == 0)
         return false;
 
-    if (desc.entryPoint().isLocalFile() && !QFile::exists(desc.entryPoint().toLocalFile()))
+    if (desc.getEntryPoint().isLocalFile() && !QFile::exists(desc.getEntryPoint().toLocalFile()))
         return false;
 
     return true;

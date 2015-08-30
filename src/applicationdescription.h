@@ -23,19 +23,23 @@
 #include <QUrl>
 #include <QStringList>
 
+#include "ApplicationDescriptionBase.h"
+
 namespace luna
 {
 
-class ApplicationDescription : public QObject
+class ApplicationDescription : public ApplicationDescriptionBase
 {
     Q_OBJECT
-    Q_PROPERTY(QString id READ id CONSTANT)
-    Q_PROPERTY(QString title READ title CONSTANT)
-    Q_PROPERTY(QUrl icon READ icon CONSTANT)
-    Q_PROPERTY(QUrl entryPoint READ entryPoint CONSTANT)
-    Q_PROPERTY(bool headless READ headless CONSTANT)
-    Q_PROPERTY(bool flickable READ flickable CONSTANT)
-    Q_PROPERTY(bool internetConnectivityRequired READ internetConnectivityRequired CONSTANT)
+    Q_PROPERTY(QString id READ getId CONSTANT)
+    Q_PROPERTY(QString title READ getTitle CONSTANT)
+    Q_PROPERTY(QUrl icon READ getIcon CONSTANT)
+    Q_PROPERTY(QUrl entryPoint READ getEntryPoint CONSTANT)
+    Q_PROPERTY(bool headless READ isHeadLess CONSTANT)
+    Q_PROPERTY(bool flickable READ isFlickable CONSTANT)
+    Q_PROPERTY(bool internetConnectivityRequired READ isInternetConnectivityRequired CONSTANT)
+    Q_PROPERTY(bool loadingAnimationDisabled READ isLoadingAnimationDisabled CONSTANT)
+    Q_PROPERTY(bool allowCrossDomainAccess READ allowCrossDomainAccess CONSTANT)
     Q_ENUMS(TrustScope)
 
 public:
@@ -48,40 +52,27 @@ public:
         TrustScopeSystem,
     };
 
-    TrustScope trustScope() const;
-    QString id() const;
-    QString title() const;
-    QUrl icon() const;
-    QUrl entryPoint() const;
-    bool headless() const;
-    bool flickable() const;
-    bool internetConnectivityRequired() const;
-    QStringList urlsAllowed() const;
-    QString userAgent() const;
-    bool useLuneOSStyle() const;
+    QString getId() const;
+    QString getTitle() const;
+    QUrl getIcon() const;
+    QUrl getEntryPoint() const;
+    QStringList getUrlsAllowed() const;
+    QString getUserAgent() const;
 
-    QString pluginName() const;
+    QString getPluginName() const;
     QString basePath() const;
 
     bool hasRemoteEntryPoint() const;
+    TrustScope trustScope() const;
+    bool useLuneOSStyle() const;
 
 private:
-    QString mId;
-    QString mTitle;
-    QUrl mIcon;
-    QUrl mEntryPoint;
-    bool mHeadless;
     QString mApplicationBasePath;
     TrustScope mTrustScope;
-    QString mPluginName;
-    bool mFlickable;
-    bool mInternetConnectivityRequired;
-    QStringList mUrlsAllowed;
-    QString mUserAgent;
     bool mUseLuneOSStyle;
 
     void initializeFromData(const QString &data);
-    QUrl locateEntryPoint(const QString &entryPoint);
+    QUrl locateEntryPoint(const QString &entryPoint) const;
 };
 
 } // namespace luna
