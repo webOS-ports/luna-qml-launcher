@@ -16,6 +16,7 @@
  */
 
 #include "lunaqmlapplication.h"
+#include <QtWebEngine/qtwebengineglobal.h>
 
 int main(int argc, char **argv)
 {
@@ -28,5 +29,7 @@ int main(int argc, char **argv)
     setenv("XDG_CACHE_HOME", appCachePath.toUtf8().constData(), 1);
 
     LunaQmlApplication application(argc, argv);
+
+    QtWebEngine::initialize();
     return application.launchApp();
 }
