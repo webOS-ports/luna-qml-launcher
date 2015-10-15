@@ -65,11 +65,13 @@ public:
     bool hasRemoteEntryPoint() const;
     TrustScope trustScope() const;
     bool useLuneOSStyle() const;
+    bool useWebEngine() const;
 
 private:
     QString mApplicationBasePath;
     TrustScope mTrustScope;
     bool mUseLuneOSStyle;
+    bool mUseWebEngine;
 
     void initializeFromData(const QString &data);
     QUrl locateEntryPoint(const QString &entryPoint) const;
