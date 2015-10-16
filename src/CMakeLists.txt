@@ -5,6 +5,7 @@ include_directories(
     ${WEBOS_APPLICATION_INCLUDE_DIRS}
     ${LUNA_SERVICE2_INCLUDE_DIRS}
     ${LUNA_SYSMGR_COMMON_INCLUDE_DIRS}
+    ${Qt5WebEngine_PRIVATE_INCLUDE_DIRS}
     ${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 
 set(SOURCES
@@ -13,7 +14,7 @@ set(SOURCES
     applicationdescription.cpp)
 
 add_executable(luna-qml-launcher ${SOURCES} ${RESOURCES})
-qt5_use_modules(luna-qml-launcher Core Gui Qml Quick)
+qt5_use_modules(luna-qml-launcher Core Gui Qml Quick WebEngine)
 target_link_libraries(luna-qml-launcher
     ${GLIB2_LIBRARIES}
     ${WEBOS_APPLICATION_LIBRARIES}

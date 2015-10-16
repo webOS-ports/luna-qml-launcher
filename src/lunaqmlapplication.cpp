@@ -28,6 +28,7 @@
 #include <QQuickItem>
 
 #include <QtGui/QGuiApplication>
+#include <QtWebEngine/qtwebengineglobal.h>
 
 #include <glib.h>
 #include <webos_application.h>
@@ -119,6 +120,11 @@ int LunaQmlApplication::launchApp()
 
     if (!setup(applicationBasePath, desc.getEntryPoint()))
         return -1;
+
+    if (desc.useWebEngine())
+    {
+        QtWebEngine::initialize();
+    }
 
     return this->exec();
 }
