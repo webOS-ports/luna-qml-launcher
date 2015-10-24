@@ -115,16 +115,16 @@ int LunaQmlApplication::launchApp()
         return -1;
     }
 
-    webos_application_init(desc.getId().toUtf8().constData(), &event_handlers, this);
-    webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
-
-    if (!setup(applicationBasePath, desc.getEntryPoint()))
-        return -1;
-
     if (desc.useWebEngine())
     {
         QtWebEngine::initialize();
     }
+
+    if (!setup(applicationBasePath, desc.getEntryPoint()))
+        return -1;
+
+    webos_application_init(desc.getId().toUtf8().constData(), &event_handlers, this);
+    webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
     return this->exec();
 }
