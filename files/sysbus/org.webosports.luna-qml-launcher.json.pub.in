@@ -4,5 +4,11 @@
         "type": "privileged",
         "allowedNames": ["*"]
     },
-    "permissions": []
+    "permissions": [
+        {
+            "service":"qtpositioning_*",
+            "inbound":["org.webosports.location"],
+            "outbound":["org.webosports.location"]
+        }
+    ]
 }
