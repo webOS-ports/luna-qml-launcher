@@ -17,6 +17,8 @@ find_package(Qt5Qml REQUIRED)
 find_package(Qt5Quick REQUIRED)
 find_package(Qt5WebEngine REQUIRED)
 
+add_definitions(-DQT_INSTALL_QML="${OE_QMAKE_PATH_QML}")
+
 find_package(PkgConfig "0.22" REQUIRED)
 
 pkg_check_modules(GLIB2 glib-2.0 REQUIRED)

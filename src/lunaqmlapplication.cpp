@@ -199,6 +199,7 @@ bool LunaQmlApplication::setup(const QString& applicationBasePath, const QUrl& p
     }
 
     mEngine.addImportPath(applicationBasePath);
+    mEngine.addImportPath(QT_INSTALL_QML "/LunaWebEngineViewStyle");
 
     mEngine.rootContext()->setContextProperty("application", this);
 
