@@ -29,6 +29,7 @@ namespace luna {
 class LunaQmlApplication : public QGuiApplication
 {
     Q_OBJECT
+    Q_PROPERTY(QObject *appInfo READ appDescription)
     Q_PROPERTY(QString launchParameters READ launchParameters)
 
 public:
@@ -38,6 +39,7 @@ public:
     int launchApp();
 
     QString launchParameters() const;
+    QObject *appDescription() const;
 
     static void onRelaunch(const char *parameters, void *user_data);
 
@@ -55,6 +57,7 @@ private:
 private:
     QQmlEngine mEngine;
     QString mManifestPath;
+    luna::ApplicationDescription *mAppDescription;
     QString mLaunchParameters;
     QQuickWindow *mWindow;
     bool mPrivileged;
