@@ -53,8 +53,9 @@ using namespace luna;
 
 LunaQmlApplication::LunaQmlApplication(int& argc, char **argv) :
     QGuiApplication(argc, argv),
+    mAppDescription(nullptr),
     mLaunchParameters("{}"),
-    mWindow(0),
+    mWindow(nullptr),
     mPrivileged(false),
     mHeadless(false)
 {
@@ -90,40 +91,40 @@ int LunaQmlApplication::launchApp()
 
     QString applicationBasePath = QFileInfo(mManifestPath).absoluteDir().path();
     qDebug() << "applicationBasePath" << applicationBasePath;
-    ApplicationDescription desc(manifestData, applicationBasePath);
+    mAppDescription = new ApplicationDescription(manifestData, applicationBasePath);
 
-    if (!validateApplication(desc)) {
+    if (!validateApplication(*mAppDescription)) {
         qWarning("Got invalid application description for app %s",
-                 desc.getId().toUtf8().constData());
+                 mAppDescription->getId().toUtf8().constData());
         return 2;
     }
 
-    if (desc.getId().startsWith("org.webosports."))
+    if (mAppDescription->getId().startsWith("org.webosports."))
         mPrivileged = true;
 
-    mHeadless = desc.isHeadLess();
+    mHeadless = mAppDescription->isHeadLess();
 
-    if (desc.useLuneOSStyle())
+    if (mAppDescription->useLuneOSStyle())
         setenv("QT_QUICK_CONTROLS_STYLE", "LuneOS", 1);
 
     // We set the application id as application name so that locally stored things for
     // each application are separated and remain after the application was stopped.
-    QCoreApplication::setApplicationName(desc.getId());
+    QCoreApplication::setApplicationName(mAppDescription->getId());
 
-    if (!setupLs2Configuration(desc.getId(), applicationBasePath)) {
+    if (!setupLs2Configuration(mAppDescription->getId(), applicationBasePath)) {
         qWarning("Failed to configure ls2 access correctly");
         return -1;
     }
 
-    if (desc.useWebEngine())
+    if (mAppDescription->useWebEngine())
     {
         QtWebEngine::initialize();
     }
 
-    if (!setup(applicationBasePath, desc.getEntryPoint()))
+    if (!setup(applicationBasePath, mAppDescription->getEntryPoint()))
         return -1;
 
-    webos_application_init(desc.getId().toUtf8().constData(), &event_handlers, this);
+    webos_application_init(mAppDescription->getId().toUtf8().constData(), &event_handlers, this);
     webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
     return this->exec();
@@ -184,11 +185,17 @@ bool LunaQmlApplication::validateApplication(const luna::ApplicationDescription&
 
 LunaQmlApplication::~LunaQmlApplication()
 {
+    if(mAppDescription) delete mAppDescription; mAppDescription = nullptr;
 }
 
 QString LunaQmlApplication::launchParameters() const
 {
     return mLaunchParameters;
+}
+
+QObject* LunaQmlApplication::appDescription() const
+{
+    return mAppDescription;
 }
 
 bool LunaQmlApplication::setup(const QString& applicationBasePath, const QUrl& path)
