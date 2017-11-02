@@ -29,7 +29,7 @@ namespace luna {
 class LunaQmlApplication : public QGuiApplication
 {
     Q_OBJECT
-    Q_PROPERTY(QObject *appInfo READ appDescription)
+    Q_PROPERTY(QObject *appInfo READ appDescription CONSTANT)
     Q_PROPERTY(QString launchParameters READ launchParameters)
 
 public:
