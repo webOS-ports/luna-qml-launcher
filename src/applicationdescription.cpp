@@ -60,7 +60,7 @@ ApplicationDescription::~ApplicationDescription()
 void ApplicationDescription::initializeFromData(const QString &data)
 {
     struct json_object* root = json_tokener_parse( data.toUtf8().constData() );
-    if( !root || is_error( root ) )
+    if(!root)
     {
         qWarning() << "Failed to parse application description";
         return;
@@ -69,16 +69,16 @@ void ApplicationDescription::initializeFromData(const QString &data)
     fromJsonObject(root);
 
 	struct json_object* label = json_object_object_get(root,"useLuneOSStyle");
-	if (label && !(is_error(label))) {
+	if (label) {
 		mUseLuneOSStyle = json_object_get_boolean(label);
 	}
 
         label = json_object_object_get(root,"useWebEngine");
-        if (label && !(is_error(label))) {
+        if (label) {
                 mUseWebEngine = json_object_get_boolean(label);
         }
 
-    if(root && !is_error(root))
+    if(root)
         json_object_put(root);
 }
 
