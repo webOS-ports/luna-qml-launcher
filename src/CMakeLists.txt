@@ -19,7 +19,7 @@ target_link_libraries(luna-qml-launcher
     ${GLIB2_LIBRARIES}
     ${WEBOS_APPLICATION_LIBRARIES}
     ${LUNA_SYSMGR_COMMON_LIBRARIES}
-    -ljson-c
+    ${JSON_LIBRARIES}
     ${LUNA_SERVICE2_LIBRARIES})
 
 webos_build_program(ADMIN)
