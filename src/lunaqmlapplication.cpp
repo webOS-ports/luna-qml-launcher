@@ -130,6 +130,9 @@ int LunaQmlApplication::launchApp()
     return this->exec();
 }
 
+//FIXME This will need replacing once we move to latest OSE LS2 commit where pub/prv is gone. 
+//Maybe we can use something like https://github.com/webosose/appinstalld2/commit/202f87e25a8a46a988979f173b7a3d36644a9046
+
 bool LunaQmlApplication::setupLs2Configuration(const QString& appId, const QString& applicationBasePath)
 {
     QString privRolePath = QString("/usr/share/ls2/roles/prv/%1.json").arg(appId);
