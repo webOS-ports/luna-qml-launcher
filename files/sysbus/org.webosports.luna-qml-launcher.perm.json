@@ -1,14 +1,10 @@
 {
-    "org.webosports.*": [
-        "all"
-    ],
-    "com.palm.*": [
-        "all"
-    ],
-    "": [
-        "all"
-    ],
-    "*": [
-        "all"
+    "org.webosports.luna-qml-launcher-*": [
+        "applications",
+        "devices",
+        "services",
+        "settings",
+        "system",
+        "private", "public"
     ]
 }
