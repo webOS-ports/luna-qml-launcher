@@ -1,0 +1,10 @@
+{
+    "org.webosports.*": [
+        "applications",
+        "devices",
+        "services",
+        "settings",
+        "system",
+        "private", "public"
+    ]
+}
