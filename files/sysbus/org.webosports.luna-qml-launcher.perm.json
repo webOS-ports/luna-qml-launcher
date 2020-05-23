@@ -1,10 +1,14 @@
 {
     "org.webosports.*": [
-        "applications",
-        "devices",
-        "services",
-        "settings",
-        "system",
-        "private", "public"
+        "all"
+    ],
+    "com.palm.*": [
+        "all"
+    ],
+    "": [
+        "all"
+    ],
+    "*": [
+        "all"
     ]
 }
