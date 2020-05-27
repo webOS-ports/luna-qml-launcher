@@ -1,6 +1,5 @@
-
 {
-    "org.webosports.*": [
+    "org.webosports.luna-qml-launcher-*": [
         "applications",
         "devices",
         "services",
