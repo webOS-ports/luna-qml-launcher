@@ -1,10 +1,5 @@
 {
     "org.webosports.luna-qml-launcher-*": [
-        "applications",
-        "devices",
-        "services",
-        "settings",
-        "system",
-        "private", "public"
+        "all"
     ]
 }
