@@ -99,7 +99,7 @@ int LunaQmlApplication::launchApp()
         return 2;
     }
 
-    if (mAppDescription->getId().startsWith("org.webosports."))
+    if (mAppDescription->getId().startsWith("org.webosports.") || mAppDescription->getId().startsWith("com.palm.") || mAppDescription->getId().startsWith("com.webos."))
         mPrivileged = true;
 
     mHeadless = mAppDescription->isHeadLess();

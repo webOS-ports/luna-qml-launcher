@@ -1,0 +1,14 @@
+{
+    "org.webosports.*": [
+        "all"
+    ],
+    "com.palm.*": [
+        "all"
+    ],
+    "": [
+        "all"
+    ],
+    "*": [
+        "all"
+    ]
+}
