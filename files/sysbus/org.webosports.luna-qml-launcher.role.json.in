@@ -1,0 +1,11 @@
+{
+    "exeName":"@WEBOS_INSTALL_SBINDIR@/luna-qml-launcher",
+    "type": "privileged",
+    "allowedNames": ["org.webosports.luna-qml-launcher-*"],
+    "permissions": [
+        {
+            "service":"org.webosports.luna-qml-launcher-*",
+            "outbound":["*"]
+        }
+    ]
+}

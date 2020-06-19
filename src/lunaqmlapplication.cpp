@@ -99,7 +99,7 @@ int LunaQmlApplication::launchApp()
         return 2;
     }
 
-    if (mAppDescription->getId().startsWith("org.webosports."))
+    if (mAppDescription->getId().startsWith("org.webosports.") || mAppDescription->getId().startsWith("com.palm.") || mAppDescription->getId().startsWith("com.webos."))
         mPrivileged = true;
 
     mHeadless = mAppDescription->isHeadLess();
@@ -121,11 +121,16 @@ int LunaQmlApplication::launchApp()
         QtWebEngine::initialize();
     }
 
+    // The main service handle is the one for luna-qml-launcher, not the one of the QML app.
+    // The service handle of the app will be managed afterwards by LunaService QML plugin.
+    QString qmlLauncherAppId = "org.webosports.luna-qml-launcher-" + QString::number(QCoreApplication::applicationPid());
+
+    webos_application_init(mAppDescription->getId().toUtf8().constData(), qmlLauncherAppId.toUtf8().constData(), &event_handlers, this);
+    webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
+
+    // Now load the QML app
     if (!setup(applicationBasePath, mAppDescription->getEntryPoint()))
         return -1;
-
-    webos_application_init(mAppDescription->getId().toUtf8().constData(), &event_handlers, this);
-    webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
     return this->exec();
 }
