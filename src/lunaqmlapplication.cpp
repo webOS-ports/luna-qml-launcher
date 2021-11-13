@@ -104,6 +104,9 @@ int LunaQmlApplication::launchApp()
 
     mHeadless = mAppDescription->isHeadLess();
 
+    // We want to make sure we can still use XHR for loading local files at our end in our QML apps.
+    qputenv("QML_XHR_ALLOW_FILE_READ", QByteArray("1"));
+    
     if (mAppDescription->useLuneOSStyle())
         setenv("QT_QUICK_CONTROLS_STYLE", "LuneOS", 1);
 
