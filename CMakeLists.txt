@@ -15,7 +15,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Qml REQUIRED)
 find_package(Qt5Quick REQUIRED)
-find_package(Qt5WebEngine REQUIRED)
 
 add_definitions(-DQT_INSTALL_QML="${OE_QMAKE_PATH_QML}")
 

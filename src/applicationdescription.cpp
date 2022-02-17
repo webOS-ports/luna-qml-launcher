@@ -38,8 +38,7 @@ ApplicationDescription::ApplicationDescription(const ApplicationDescription& oth
     ApplicationDescriptionBase(other),
     mApplicationBasePath(other.basePath()),
     mTrustScope(other.trustScope()),
-    mUseLuneOSStyle(other.useLuneOSStyle()),
-    mUseWebEngine(other.useWebEngine())
+    mUseLuneOSStyle(other.useLuneOSStyle())
 {
 }
 
@@ -47,8 +46,7 @@ ApplicationDescription::ApplicationDescription(const QString &data, const QStrin
     ApplicationDescriptionBase(),
     mApplicationBasePath(applicationBasePath),
     mTrustScope(ApplicationDescription::TrustScopeSystem),
-    mUseLuneOSStyle(false),
-    mUseWebEngine(false)
+    mUseLuneOSStyle(false)
 {
     initializeFromData(data);
 }
@@ -72,11 +70,6 @@ void ApplicationDescription::initializeFromData(const QString &data)
 	if (label) {
 		mUseLuneOSStyle = json_object_get_boolean(label);
 	}
-
-        label = json_object_object_get(root,"useWebEngine");
-        if (label) {
-                mUseWebEngine = json_object_get_boolean(label);
-        }
 
     if(root)
         json_object_put(root);
@@ -173,11 +166,6 @@ QString ApplicationDescription::getUserAgent() const
 bool ApplicationDescription::useLuneOSStyle() const
 {
     return mUseLuneOSStyle;
-}
-
-bool ApplicationDescription::useWebEngine() const
-{
-    return mUseWebEngine;
 }
 
 }

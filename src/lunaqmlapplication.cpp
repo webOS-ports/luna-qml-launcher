@@ -28,7 +28,6 @@
 #include <QQuickItem>
 
 #include <QtGui/QGuiApplication>
-#include <QtWebEngine/qtwebengineglobal.h>
 
 #include <glib.h>
 #include <webos_application.h>
@@ -117,11 +116,6 @@ int LunaQmlApplication::launchApp()
     if (!setupLs2Configuration(mAppDescription->getId(), applicationBasePath)) {
         qWarning("Failed to configure ls2 access correctly");
         return -1;
-    }
-
-    if (mAppDescription->useWebEngine())
-    {
-        QtWebEngine::initialize();
     }
 
     // The main service handle is the one for luna-qml-launcher, not the one of the QML app.
@@ -217,7 +211,6 @@ bool LunaQmlApplication::setup(const QString& applicationBasePath, const QUrl& p
     }
 
     mEngine.addImportPath(applicationBasePath);
-    mEngine.addImportPath(QT_INSTALL_QML "/LunaWebEngineViewStyle");
 
     mEngine.rootContext()->setContextProperty("application", this);
 
